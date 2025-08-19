@@ -1,12 +1,11 @@
-import express from "express";
 import dotenv from "dotenv";
 import http from "http";
 import { Server } from "socket.io";
+dotenv.config();
 
 import app from "./app";
 import sequelize from "@/config/db";
 
-dotenv.config();
 const PORT = process.env.PORT || 5000;
 
 //my http server
@@ -24,8 +23,12 @@ io.on("connection", (socket) => {
 
 const startServer = async () => {
   try {
-    // await sequelize.authenticate();
-    // console.log("✅ DB connected");
+    await sequelize.authenticate();
+    console.log("✅ DB connected");
+    await sequelize.sync(
+      
+    ); //  creates tables based on my defined models
+    console.log("📦 Models synced to DB");
 
     server.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
@@ -35,4 +38,4 @@ const startServer = async () => {
   }
 };
 
-startServer()
+startServer();

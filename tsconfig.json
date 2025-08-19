@@ -17,7 +17,8 @@
     "paths": {
       "@/*": ["*"],
       "@/models/*": ["model/*"],
-      "@/config/*": ["config/*"]
+      "@/config/*": ["config/*"],
+      "@/utils/*": ["utils/*"],
     }
   },
   "include": ["src"],

@@ -1,14 +1,16 @@
+import bcrypt from "bcrypt";
 import {
   Table,
   Column,
   Model,
   DataType,
   PrimaryKey,
-  AutoIncrement,
   Unique,
   AllowNull,
   CreatedAt,
   UpdatedAt,
+  BeforeCreate,
+  Default,
 } from "sequelize-typescript";
 
 @Table({
@@ -17,9 +19,9 @@ import {
 })
 export class User extends Model<User> {
   @PrimaryKey
-  @AutoIncrement
-  @Column(DataType.INTEGER)
-  id!: number;
+  @Default(DataType.UUIDV4) // Automatically generates a UUID
+  @Column(DataType.UUID)
+  id!: string;
 
   @Unique
   @AllowNull(false)
@@ -42,4 +44,10 @@ export class User extends Model<User> {
 
   @UpdatedAt
   updatedAt!: Date;
+
+  // hash password on create
+  @BeforeCreate
+  static async hashPassword(user: User) {
+    user.password = await bcrypt.hash(user.password, 10);
+  }
 }

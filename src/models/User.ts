@@ -12,6 +12,7 @@ import {
   BeforeCreate,
   Default,
 } from "sequelize-typescript";
+import { Room } from "./Room";
 
 @Table({
   tableName: "users",
@@ -51,3 +52,6 @@ export class User extends Model<User> {
     user.password = await bcrypt.hash(user.password, 10);
   }
 }
+
+// User.hasMany(Room, { foreignKey: "createdBy" });
+// User.belongsToMany(Room, { through: RoomMember })

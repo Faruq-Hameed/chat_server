@@ -5,7 +5,11 @@ import {
   createUserValidator,
   loginValidator,
 } from "@/utils/validators/user.validators";
-import { BadRequestException, ConflictException, NotFoundException } from "@/exceptions/";
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from "@/exceptions/";
 import { createAuthToken } from "@/utils/token";
 import { Op } from "sequelize";
 
@@ -32,6 +36,7 @@ export const createUserController = async (
     }
 
     const user = await User.create(value);
+    user.password = ""; // hide password from response
     const token = createAuthToken({ id: user.id, username: user.username });
     res.status(201).json({
       success: true,
@@ -56,7 +61,12 @@ export const loginController = async (
       throw new BadRequestException(error.details[0].message);
     }
 
-    const user = await User.findOne({ where: { email: value.email } });
+    const user = await User.findOne({
+      where: { email: value.email },
+      attributes: {
+        exclude: ["password"],
+      },
+    });
     if (!user) {
       throw new NotFoundException("Invalid login credentials");
     }
@@ -81,7 +91,11 @@ export const getUsers = async (
   next: NextFunction
 ) => {
   try {
-    const users = await User.findAll();
+    const users = await User.findAll({
+      attributes: {
+        exclude: ["password"],
+      },
+    });
     res.status(200).json({
       success: true,
       message: "Users fetched successfully",
@@ -99,7 +113,11 @@ export const getUserById = async (
 ) => {
   try {
     const { id } = req.params;
-    const user = await User.findByPk(id);
+    const user = await User.findByPk(id, {
+      attributes: {
+        exclude: ["password"],
+      },
+    });
     if (!user) {
       throw new Error("User not found");
     }

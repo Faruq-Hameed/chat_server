@@ -9,7 +9,9 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "types": ["node", "express", "socket.io"],
+    "types": ["node", "express", 
+    // "socket.io"
+  ],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
 
@@ -19,8 +21,12 @@
       "@/models/*": ["model/*"],
       "@/config/*": ["config/*"],
       "@/utils/*": ["utils/*"],
-    }
+      "@/routers/*": ["routers/*"],
+      "@/middlewares/*": ["middlewares/*"],
+      "@/types/*": ["types/*"],
+    },
+    "typeRoots": ["./src/types", "./node_modules/@types"]
   },
-  "include": ["src"],
+  "include": ["src", "types"],
   "exclude": ["node_modules", "dist"]
 }

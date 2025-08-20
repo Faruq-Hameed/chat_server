@@ -11,11 +11,17 @@ import {
   BelongsTo,
   HasMany,
   BelongsToMany,
+  Index,
 } from "sequelize-typescript";
 import { User } from "./User";
 import { RoomMember } from "./RoomMembers";
 
-@Table({ tableName: "rooms" })
+@Table({
+  tableName: "rooms",
+  defaultScope: {
+    order: [["createdAt", "DESC"]], // newest first during find all
+  },
+})
 export class Room extends Model {
   @PrimaryKey
   @Default(DataType.UUIDV4)
@@ -32,6 +38,7 @@ export class Room extends Model {
   @Column(DataType.BOOLEAN)
   isPrivate!: boolean;
 
+  @Index("createdBy")
   @ForeignKey(() => User)
   @Column(DataType.UUID)
   createdBy!: string;

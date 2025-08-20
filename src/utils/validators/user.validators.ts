@@ -2,7 +2,7 @@ import Joi from "joi";
 import bcrypt from "bcrypt";
 
 import { User } from "@/models";
-import { LoginPayload } from "@/utils/types/login";
+import { LoginPayload } from "@/types/login";
 
 /**Validator for creating user
  *@param data - Partial<User> - Partial<User> is a type that represents a subset of the User type.

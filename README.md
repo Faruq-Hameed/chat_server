@@ -1,26 +1,61 @@
-chat-backend/
-│── src/
-│   ├── config/
-│   │   └── db.ts              # Database connection (Sequelize or Prisma)
-│   ├── controllers/           # Route handlers (auth, rooms, messages)
-│   ├── middleware/            # JWT auth, rate limiter, etc.
-│   ├── models/                # Sequelize/Prisma models (users, rooms, messages)
-│   ├── routes/                # Express routes (auth, rooms, chat)
-│   ├── sockets/               # Socket.IO event handlers
-│   │   └── chat.socket.ts
-│   ├── utils/                 # Helper functions (token, validators)
-│   ├── app.ts                 # Express app setup
-│   └── server.ts              # Entry point (http + socket.io)
-├── docker-compose.yml         # Docker setup for MySQL + backend
-├── Dockerfile                 # Backend container
-├── package.json
-├── tsconfig.json
-└── .env                       # Environment variables
+# Chat Backend API
+
+A Node.js/Express backend for a chat application, featuring user authentication, room management (public/private), invites, and real-time communication via WebSockets.
+
+---
+
+## Features
+
+- **User Authentication**: Register, login, and JWT-based authentication.
+- **Room Management**: Create, join, and leave public or private chat rooms.
+- **Room Invites**: Generate and manage invite tokens for private rooms.
+- **Room Membership**: Track and manage room members.
+- **Real-Time Messaging**: Uses Socket.IO for real-time chat and events.
+- **Validation**: Uses Joi for input validation and custom middlewares for UUID validation.
+- **Database**: Sequelize ORM with PostgreSQL (or other supported dialects).
+- **Error Handling**: Custom exceptions and centralized error handling.
+
+---
+
+## Project Structure
+
+```
+src/
+│
+├── config/           # Database and environment configuration
+├── controllers/      # Express route controllers (business logic)
+├── middlewares/      # Express middlewares (auth, validation, etc.)
+├── models/           # Sequelize models (User, Room, RoomMember, RoomInvite)
+├── routes/           # Express route definitions
+├── sockets/          # Socket.IO setup and event handlers
+├── utils/            # Utility functions (JWT, helpers, etc.)
+├── app.ts            # Express app setup
+├── server.ts         # Entry point, server and DB initialization
+└── exceptions/       # Custom error classes
+```
+
+---
 
 
-UUIDs as IDs instead of auto-increment integers. In fact, for a chat app where you’ll be sharing room IDs or message IDs with clients, UUIDs are safer and easier (avoids predictable sequential IDs).
+## Key Endpoints
 
-For room, only the person that created it can create an invite token and also fectch the invite token. It can be extended to allow admin but I didnt consider that during this implemnteaion. Also once arow is created, the creator authomatically join the room.
+### Auth
+- `POST /api/v1/auth/register` — Register a new user
+- `POST /api/v1/auth/login` — Login and receive JWT
+
+### Rooms
+- `POST /api/v1/rooms` — Create a new room
+- `GET /api/v1/rooms` — List all rooms
+- `GET /api/v1/rooms/:roomId` — Get room by ID
+- `POST /api/v1/rooms/:roomId/join` — Join a public room
+- `POST /api/v1/rooms/:roomId/invites` — Create invite for a private room (creator only)
+- `POST /api/v1/rooms/invites/:token/join` — Join a private room via invite
+
+### Members
+- `GET /api/v1/rooms/:roomId/members` — List members of a room
+- `GET /api/v1/users/:userId/rooms` — List rooms a user belongs to
+
+---
 
 # Socket.IO Events Documentation
 

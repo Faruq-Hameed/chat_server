@@ -63,9 +63,6 @@ export const loginController = async (
 
     const user = await User.findOne({
       where: { email: value.email },
-      attributes: {
-        exclude: ["password"],
-      },
     });
     if (!user) {
       throw new NotFoundException("Invalid login credentials");
@@ -73,6 +70,7 @@ export const loginController = async (
     if (!comparePassword(value.password, user.password)) {
       throw new BadRequestException("Invalid login credentials");
     }
+    user.password
     const token = createAuthToken({ id: user.id, username: user.username });
     res.status(200).json({
       success: true,

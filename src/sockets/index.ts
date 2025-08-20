@@ -1,18 +1,17 @@
-// sockets/index.ts
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
 import { TokenException } from "@/exceptions";
-import { Room, RoomMember, Message, User } from "@/models"; // Adjust import paths
+import {  RoomMember, Message, User } from "@/models"; 
 
 let io: Server;
 
-// Track online users
+// Track all online users
 const onlineUsers = new Map<string, { socketId: string; userId: string; username: string }>();
 
 export const initSocket = (server: any) => {
   io = new Server(server, {
     cors: {
-      origin: "*", // 🔒 Restrict to frontend URL in production
+      origin: "*", // if production it will be restrict to frontend URL in production
     },
   });
 
@@ -163,12 +162,13 @@ export const initSocket = (server: any) => {
           where: { roomId },
           include: [
             {
-              model: User, as: "user", // Adjust model name as needed
+              model: User, as: "user", 
               attributes: ['id', 'username'],
             }
           ]
         });
 
+        //mapping for room users that are in the onlineUsers
         const roomUsers = roomMembers.map(member => ({
           userId: member.userId,
           username: member.user.username,

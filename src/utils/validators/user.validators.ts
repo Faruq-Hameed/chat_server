@@ -18,7 +18,7 @@ export const createUserValidator = (
   });
   return schema.validate(data, {
     abortEarly: false, // show all errors, not just the first
-    stripUnknown: true, // remove unexpected fields
+    // stripUnknown: true, // remove unexpected fields
   });
 };
 
@@ -31,7 +31,7 @@ export const loginValidator = (
   });
   return schema.validate(data, {
     abortEarly: false, // show all errors, not just the first
-    stripUnknown: true, // remove unexpected fields
+    // stripUnknown: true, // remove unexpected fields
   });
 };
 

@@ -1,4 +1,4 @@
-import authsRouter from "./auths.routers";
+import authsRouter from "./users.routers";
 import roomsRouter from "./rooms.routers";
 
 export default {

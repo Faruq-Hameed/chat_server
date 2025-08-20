@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 import http from "http";
-import { Server } from "socket.io";
 dotenv.config();
 
 import app from "./app";
@@ -12,17 +11,7 @@ const PORT = process.env.PORT || 5000;
 //my http server
 const server = http.createServer(app);
 
-// const io = new Server(server, {
-//   cors: {
-//     origin: "*", //🔒 this will later restrict to frontend URL
-//   },
-// });
-// // start socket.io
 initSocket(server);
-
-// io.on("connection", (socket) => {
-//   console.log("New client connected: ", socket.id);
-// });
 
 const startServer = async () => {
   try {

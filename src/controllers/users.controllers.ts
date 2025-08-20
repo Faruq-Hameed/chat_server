@@ -5,7 +5,7 @@ import {
   createUserValidator,
   loginValidator,
 } from "@/utils/validators/user.validators";
-import { BadRequestException, NotFoundException } from "@/exceptions/";
+import { BadRequestException, ConflictException, NotFoundException } from "@/exceptions/";
 import { createAuthToken } from "@/utils/token";
 import { Op } from "sequelize";
 
@@ -28,7 +28,7 @@ export const createUserController = async (
     });
 
     if (existingUser) {
-      throw new BadRequestException("username or email already exists");
+      throw new ConflictException("username or email already exists");
     }
 
     const user = await User.create(value);

@@ -31,9 +31,9 @@ export class RoomMember extends Model {
   @Column(DataType.UUID)
   roomId!: string;
 
-  @Default("member")
-  @Column(DataType.ENUM("admin", "member"))
-  role!: string;
+  // @Default("member") //THIS CAN BE USED IF WE HAVE ROLES FUNCTIONALITIES
+  // @Column(DataType.ENUM("admin", "member"))
+  // role!: string;
 
   @BelongsTo(() => User)
   user!: User;

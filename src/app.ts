@@ -14,8 +14,8 @@ app.use(morgan("dev"));
 
 //I am having issue validating empty request body with my joi validator
 app.use((req: Request, res: Response, next: NextFunction) => {
-  if(req.method === "POST" && !req.body){
-    throw new BadRequestException("Missing request body!")
+  if (req.method === "POST" && !req.body && req.url.includes("auths")) {
+    throw new BadRequestException("Missing request body!");
   }
   next();
 });

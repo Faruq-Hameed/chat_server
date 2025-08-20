@@ -8,6 +8,7 @@ import {
   PrimaryKey,
   CreatedAt,
   BelongsTo,
+  Unique,
 } from "sequelize-typescript";
 import { Room } from "@/models";
 import { User } from "@/models";
@@ -19,6 +20,7 @@ export class RoomInvite extends Model {
   @Column(DataType.UUID)
   id!: string;
 
+  @Unique("room_invites_roomId_unique") // a room can only have an invite link roq
   @ForeignKey(() => Room)
   @Column(DataType.UUID)
   roomId!: string;
@@ -28,10 +30,10 @@ export class RoomInvite extends Model {
   createdBy!: string;
 
   @Column(DataType.STRING)
-  token!: string; // unique random string ( shortid)
+  inviteCode!: string; // unique random string ( shortid)
 
-  @Column(DataType.DATE)
-  expiresAt!: Date;
+  //   @Column(DataType.DATE)
+  //   expiresAt!: Date;
 
   @CreatedAt
   createdAt!: Date;

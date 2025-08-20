@@ -19,3 +19,5 @@ chat-backend/
 
 
 UUIDs as IDs instead of auto-increment integers. In fact, for a chat app where you’ll be sharing room IDs or message IDs with clients, UUIDs are safer and easier (avoids predictable sequential IDs).
+
+For room, only the person that created it can create an invite token and also fectch the invite token. It can be extended to allow admin but I didnt consider that during this implemnteaion. Also once arow is created, the creator authomatically join the room.

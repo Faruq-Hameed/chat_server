@@ -7,10 +7,20 @@ function isUuid(id: string): boolean {
   return uuidV4Regex.test(id);
 }
 /**Middleware to validate the UUID in the request parameters. */
+// export function uuidValidator(req: Request, res: Response, next: NextFunction) {
+//   const { id } = req.params;
+//   if (!id || !isUuid(id)) {
+//      throw new BadRequestException("Invalid or missing UUID in parameters.")
+//   }
+//   next();
+// }
 export function uuidValidator(req: Request, res: Response, next: NextFunction) {
-  const { id } = req.params;
-  if (!id || !isUuid(id)) {
-     throw new BadRequestException("Invalid or missing UUID in parameters.")
+  // take the first param value in the route
+  const [paramName, paramValue] = Object.entries(req.params)[0] || [];
+
+  if (!paramValue || !isUuid(paramValue)) {
+    throw new BadRequestException(`Invalid or missing ${paramName || "id"}.}`);
   }
+
   next();
 }

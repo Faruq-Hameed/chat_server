@@ -33,7 +33,11 @@ export const createUserController = async (
 
     const user = await User.create(value);
     const token = createAuthToken({ id: user.id, username: user.username });
-    res.status(201).send({ message: "user created successfully", user, token });
+    res.status(201).json({
+      success: true,
+      message: "user created successfully",
+      data: { user, token },
+    });
   } catch (error) {
     next(error);
   }
@@ -54,13 +58,17 @@ export const loginController = async (
 
     const user = await User.findOne({ where: { email: value.email } });
     if (!user) {
-      throw new NotFoundException("User not found");
+      throw new NotFoundException("Invalid login credentials");
     }
     if (!comparePassword(value.password, user.password)) {
-      throw new BadRequestException("Incorrect password");
+      throw new BadRequestException("Invalid login credentials");
     }
     const token = createAuthToken({ id: user.id, username: user.username });
-    res.status(200).send({ message: "Login successful", user, token });
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      data: { user, token },
+    });
   } catch (error) {
     next(error);
   }
@@ -74,7 +82,11 @@ export const getUsers = async (
 ) => {
   try {
     const users = await User.findAll();
-    res.status(200).json(users);
+    res.status(200).json({
+      success: true,
+      message: "Users fetched successfully",
+      data: users,
+    });
   } catch (error) {
     next(error);
   }
@@ -91,7 +103,11 @@ export const getUserById = async (
     if (!user) {
       throw new Error("User not found");
     }
-    res.status(200).json(user);
+    res.status(200).json({
+      success: true,
+      message: "User fetched successfully",
+      data: user,
+    });
   } catch (error) {
     next(error);
   }

@@ -8,6 +8,7 @@ import {
 } from "@/exceptions/";
 
 import { createRoomValidator } from "@/utils/validators/room.validator";
+import { io } from "@/sockets";
 
 /**controller to create a room */
 export const createRoomController = async (
@@ -183,10 +184,22 @@ export const joinPublicRoomById = async (
       userId,
       role: "member",
     });
+    // ✅ Emit socket event after join success
+    io.to(roomId).emit("user_joined", {
+      userId,
+      name: req.user!.username,
+      roomId: roomId,
+    });
     res.status(200).json({
       success: true,
       message: "Joined room successfully",
-      data: room,
+      data: {
+        room,
+        socketInstructions: { // to be used by frontend for real time tracking
+          event: "join_room",
+          payload: { roomId },
+        },
+      },
     });
   } catch (error) {
     next(error);
@@ -299,6 +312,13 @@ export const joinPrivateRoom = async (
       }),
     ]);
 
+    // ✅ Emit socket event after join success
+    io.to(invite.roomId).emit("user_joined", {
+      userId,
+      name: req.user!.username,
+      roomId: invite.roomId,
+    });
+
     res.json({
       success: true,
       message: "Joined private room successfully",
@@ -306,5 +326,46 @@ export const joinPrivateRoom = async (
     });
   } catch (err) {
     next(err);
+  }
+};
+
+/**
+ * Leave a room
+ */
+export const leaveRoom = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { roomId } = req.params;
+    const userId = req.user?.id;
+
+    const membership = await RoomMember.findOne({
+      where: { roomId, userId }
+    });
+
+    if (!membership) {
+      throw new NotFoundException("You are not a member of this room");
+    }
+
+    // Remove membership
+    await membership.destroy();
+
+    // Emit socket event to notify remaining room members
+    io.to(roomId).emit("user_left_room", {
+      userId,
+      username: req.user!.username,
+      roomId,
+      leftAt: new Date().toISOString(),
+      message: `${req.user!.username} left the room`,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Left room successfully",
+    });
+  } catch (error) {
+    next(error);
   }
 };

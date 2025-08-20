@@ -6,16 +6,25 @@ import {
   ForeignKey,
   BelongsTo,
   CreatedAt,
+  UpdatedAt,
 } from "sequelize-typescript";
 import { User } from "@/models";
 import { Room } from "@/models";
 
 @Table({
   tableName: "messages",
+  indexes: [
+    {
+      unique: true,
+      fields: ["userId", "roomId"],
+    },
+  ],
   timestamps: true,
-  updatedAt: false, //no need to update time since the chats are not editable
+  defaultScope: {
+    order: [["createdAt", "DESC"]], // newest first during find all
+  },
 })
-export class Message extends Model<Message> {
+export class Message extends Model {
   @ForeignKey(() => User)
   @Column({
     type: DataType.UUID,
@@ -45,6 +54,9 @@ export class Message extends Model<Message> {
 
   @CreatedAt
   createdAt!: Date;
+
+  @UpdatedAt
+  updatedAt!: Date;
 
   // Relations
   @BelongsTo(() => User)

@@ -5,21 +5,24 @@ dotenv.config();
 
 import app from "./app";
 import sequelize from "@/config/db";
+import { initSocket } from "./sockets";
 
 const PORT = process.env.PORT || 5000;
 
 //my http server
 const server = http.createServer(app);
 
-const io = new Server(server, {
-  cors: {
-    origin: "*", //🔒 this will later restrict to frontend URL
-  },
-});
+// const io = new Server(server, {
+//   cors: {
+//     origin: "*", //🔒 this will later restrict to frontend URL
+//   },
+// });
+// // start socket.io
+initSocket(server);
 
-io.on("connection", (socket) => {
-  console.log("New client connected: ", socket.id);
-});
+// io.on("connection", (socket) => {
+//   console.log("New client connected: ", socket.id);
+// });
 
 const startServer = async () => {
   try {

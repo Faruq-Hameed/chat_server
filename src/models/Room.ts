@@ -15,6 +15,7 @@ import {
 } from "sequelize-typescript";
 import { User } from "./User";
 import { RoomMember } from "./RoomMembers";
+import { Message } from "./Message";
 
 @Table({
   tableName: "rooms",
@@ -59,4 +60,7 @@ export class Room extends Model {
   // users = shortcut to users through RoomMember
   @BelongsToMany(() => User, () => RoomMember)
   users!: User[];
+
+  @HasMany(() => Message)
+  messages!: Message[];
 }

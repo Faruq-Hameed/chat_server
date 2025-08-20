@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { Room, RoomMember, User } from "@/models";
+import { Room, RoomMember, RoomInvite, User } from "@/models";
 import {
   BadRequestException,
   ConflictException,
@@ -128,10 +128,85 @@ export const getRoomsByUserId = async (
   }
 };
 
-// export const joinRoom = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   try {
-//     const { error, value } = Joi.validate(req.body,
+/**Controller to create a room invite by the creator or admin */
+export const createInvite = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id: roomId } = req.params;
+    const userId = req.user!.id;
+
+    // check if requester is an admin
+    const member = await RoomMember.findOne({ where: { userId, roomId } });
+    if (!member || member.role !== "admin") {
+      throw new ForbiddenException("Only admins can invite");
+    }
+
+    const token = crypto.getRandomValues(new Uint8Array(16));
+    const invite = await RoomInvite.create({
+      roomId,
+      createdBy: userId,
+      token,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // expires in 7 days
+    });
+
+    res.json({ link: `https://yourapp.com/join/${invite.token}` });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getRoomInviteByCreator = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const roomId = req.params.id;
+    const userId = req.user!.id;
+    //only the person who created the room invite can see the invite
+    const invite = await RoomInvite.findOne({
+      where: { roomId, createdBy: userId },
+      include: { model: Room },
+    });
+    if (!invite) throw new NotFoundException("Invite not found for the room");
+
+    res.json(invite);
+  } catch (error) {}
+};
+
+export const joinPrivateRoom = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { token } = req.params;
+    const userId = req.user!.id;
+
+    const invite = await RoomInvite.findOne({ where: { token } });
+    if (!invite) throw new NotFoundException("Invalid invite");
+    if (invite.expiresAt < new Date())
+      throw new ForbiddenException("Invite expired");
+
+    // check membership
+    const existing = await RoomMember.findOne({
+      where: { userId, roomId: invite.roomId },
+    });
+    if (existing) {
+      throw new ConflictException("Already a member");
+    }
+
+    await RoomMember.create({
+      roomId: invite.roomId,
+      userId,
+      role: "member",
+    });
+
+    res.json({ message: "Joined private room successfully" });
+  } catch (err) {
+    next(err);
+  }
+};

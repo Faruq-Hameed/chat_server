@@ -16,11 +16,10 @@ export const createUserValidator = (
     email: Joi.string().email().required(),
     password: Joi.string().min(6).required(),
   });
- return schema.validate(data, {
-  abortEarly: false,      // show all errors, not just the first
-  stripUnknown: true,     // remove unexpected fields
-});
-
+  return schema.validate(data, {
+    abortEarly: false, // show all errors, not just the first
+    stripUnknown: true, // remove unexpected fields
+  });
 };
 
 export const loginValidator = (
@@ -30,11 +29,10 @@ export const loginValidator = (
     email: Joi.string().email().required(),
     password: Joi.string().min(6).required(),
   });
- return schema.validate(data, {
-  abortEarly: false,      // show all errors, not just the first
-  stripUnknown: true,     // remove unexpected fields
-});
-
+  return schema.validate(data, {
+    abortEarly: false, // show all errors, not just the first
+    stripUnknown: true, // remove unexpected fields
+  });
 };
 
 /**compare password with hashed password using bcrypt compare

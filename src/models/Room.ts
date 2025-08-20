@@ -1,18 +1,22 @@
-import { Model } from "sequelize";
 import {
+  Table,
+  Column,
+  Model,
   PrimaryKey,
   Default,
   DataType,
-  Column,
   ForeignKey,
   CreatedAt,
   UpdatedAt,
   BelongsTo,
+  HasMany,
+  BelongsToMany,
 } from "sequelize-typescript";
 import { User } from "./User";
 import { RoomMember } from "./RoomMembers";
 
-export class Room extends Model<Room> {
+@Table({ tableName: "rooms" })
+export class Room extends Model {
   @PrimaryKey
   @Default(DataType.UUIDV4)
   @Column(DataType.UUID)
@@ -24,25 +28,28 @@ export class Room extends Model<Room> {
   @Column(DataType.TEXT)
   description?: string;
 
+  @Default(false)
   @Column(DataType.BOOLEAN)
   isPrivate!: boolean;
-  defaultValue = false;
 
-//   @ForeignKey(() => User)
-//   @Column(DataType.UUID)
-//   createdBy!: string;
+  @ForeignKey(() => User)
+  @Column(DataType.UUID)
+  createdBy!: string;
 
   @BelongsTo(() => User)
   creator!: User;
 
   @CreatedAt
-  @Column(DataType.DATE)
   createdAt!: Date;
 
   @UpdatedAt
-  @Column(DataType.DATE)
   updatedAt!: Date;
+
+  // members = join rows
+  @HasMany(() => RoomMember)
+  members!: RoomMember[];
+
+  // users = shortcut to users through RoomMember
+  @BelongsToMany(() => User, () => RoomMember)
+  users!: User[];
 }
-
-// Room.hasMany(RoomMember);
-

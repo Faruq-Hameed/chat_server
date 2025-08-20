@@ -11,8 +11,11 @@ import {
   UpdatedAt,
   BeforeCreate,
   Default,
+  BelongsToMany,
+  HasMany,
 } from "sequelize-typescript";
 import { Room } from "./Room";
+import { RoomMember } from "./RoomMembers";
 
 @Table({
   tableName: "users",
@@ -45,6 +48,13 @@ export class User extends Model<User> {
 
   @UpdatedAt
   updatedAt!: Date;
+
+
+  @HasMany(() => RoomMember)
+  roomMemberships!: RoomMember[];
+
+  @BelongsToMany(() => Room, () => RoomMember)
+  rooms!: Room[];
 
   // hash password on create
   @BeforeCreate

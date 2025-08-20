@@ -4,7 +4,7 @@ import {
   comparePassword,
   createUserValidator,
   loginValidator,
-} from "@/utils/validators";
+} from "@/utils/validators/user.validators";
 import { BadRequestException, NotFoundException } from "@/exceptions/";
 import { createAuthToken } from "@/utils/token";
 import { Op } from "sequelize";

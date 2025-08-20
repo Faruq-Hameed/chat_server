@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize-typescript";
-import { User } from "@/models";
+import { Room, RoomMember, User } from "@/models";
 
 const sequelize = new Sequelize({
   dialect: "mysql",
@@ -9,7 +9,7 @@ const sequelize = new Sequelize({
   password: process.env.DB_PASS as string,
   database: process.env.DB_NAME as string,
   logging: false,
-  models: [User],
+  models: [User, Room, RoomMember],
 });
 
 export default sequelize;

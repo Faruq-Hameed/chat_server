@@ -1,27 +1,42 @@
-import { Model } from "sequelize";
-import { Table, PrimaryKey, AutoIncrement, Column, DataType, ForeignKey } from "sequelize-typescript";
-import { Room } from "./Room";
+import {
+  Table,
+  Column,
+  Model,
+  PrimaryKey,
+  DataType,
+  ForeignKey,
+  BelongsTo,
+  Default,
+} from "sequelize-typescript";
 import { User } from "./User";
+import { Room } from "./Room";
 
-@Table
-export class RoomMember extends Model<RoomMember> {
+@Table({
+  indexes: [{ unique: true, fields: ["userId", "roomId"] }],
+  defaultScope: {
+    order: [["createdAt", "DESC"]], // newest first during find all
+  },
+})
+export class RoomMember extends Model {
   @PrimaryKey
-  @AutoIncrement
-  @Column(DataType.INTEGER)
-  id!: number;
+  @Default(DataType.UUIDV4)
+  @Column(DataType.UUID)
+  id!: string;
 
-//   @ForeignKey(() => User)
-//   @Column(DataType.UUID)
-//   userId!: string;
+  @ForeignKey(() => User)
+  @Column(DataType.UUID)
+  userId!: string;
 
-//   @ForeignKey(() => Room)
+  @ForeignKey(() => Room)
   @Column(DataType.UUID)
   roomId!: string;
 
-  @Column(DataType.STRING)
-  role?: string; // e.g., "admin", "member"
+  @Column(DataType.ENUM("admin", "member"))
+  role?: string;
+
+  @BelongsTo(() => User)
+  user!: User;
+
+  @BelongsTo(() => Room)
+  room!: Room;
 }
-
-// RoomMember.belongsTo(Room);
-// RoomMember.belongsTo(User);
-

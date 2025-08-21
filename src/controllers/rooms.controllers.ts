@@ -184,10 +184,12 @@ export const joinPublicRoomById = async (
       userId,
       role: "member",
     });
-    // ✅ Emit socket event after join success
+    //  Emit socket event after join success
     io.to(roomId).emit("user_joined", {
       userId,
       name: req.user!.username,
+      type: "joined",
+      timestamp: new Date().toISOString(),
       roomId: roomId,
     });
     res.status(200).json({
@@ -195,10 +197,6 @@ export const joinPublicRoomById = async (
       message: "Joined room successfully",
       data: {
         room,
-        socketInstructions: { // to be used by frontend for real time tracking
-          event: "join_room",
-          payload: { roomId },
-        },
       },
     });
   } catch (error) {
@@ -294,29 +292,31 @@ export const joinPrivateRoom = async (
 
     const invite = await RoomInvite.findOne({ where: { token } });
     if (!invite) throw new NotFoundException("Invalid invite");
-
-    // check membership
+    const roomId = invite.roomId;
+    // check if user in the membership list
     const existing = await RoomMember.findOne({
-      where: { userId, roomId: invite.roomId },
+      where: { userId, roomId },
     });
     if (existing) {
       throw new ConflictException("Already a member");
     }
 
     const [room] = await Promise.all([
-      Room.findByPk(invite.roomId),
+      Room.findByPk(roomId),
       RoomMember.create({
-        roomId: invite.roomId,
+        roomId,
         userId,
         role: "member",
       }),
     ]);
 
-    // ✅ Emit socket event after join success
-    io.to(invite.roomId).emit("user_joined", {
+    // Emit socket event after join success
+    io.to(roomId).emit("user_joined", {
       userId,
       name: req.user!.username,
-      roomId: invite.roomId,
+      type: "joined",
+      timestamp: new Date().toISOString(),
+      roomId,
     });
 
     res.json({
@@ -340,11 +340,26 @@ export const leaveRoom = async (
   try {
     const { roomId } = req.params;
     const userId = req.user?.id;
+    const [room, membership] = await Promise.all([
+      Room.findByPk(roomId),
+      RoomMember.findOne({
+        where: { roomId, userId },
+        include: {
+          model: User, as: "user",
+          attributes: ["id", "username", "email"],
+        },
+      }),
+    ]);
+    if (!room) {
+      throw new NotFoundException("Room not found");
+    }
 
-    const membership = await RoomMember.findOne({
-      where: { roomId, userId }
-    });
-
+    //stop the group creator from leaving the room
+    if (room.createdBy === userId) {
+      throw new ForbiddenException(
+        "You cannot leave the room you created. Delete the room instead!"
+      );
+    }
     if (!membership) {
       throw new NotFoundException("You are not a member of this room");
     }
@@ -353,14 +368,13 @@ export const leaveRoom = async (
     await membership.destroy();
 
     // Emit socket event to notify remaining room members
-    io.to(roomId).emit("user_left_room", {
-      userId,
-      username: req.user!.username,
-      roomId,
-      leftAt: new Date().toISOString(),
-      message: `${req.user!.username} left the room`,
-    });
-
+   io.to(roomId).emit("user_left", {
+     userId,
+     username: membership.user.username,
+     roomId,
+     type: "permanent", // distinguishable
+     timestamp: new Date().toISOString(),
+   });
     res.status(200).json({
       success: true,
       message: "Left room successfully",

@@ -10,7 +10,7 @@ export const createMessage = async (
   next: NextFunction
 ) => {
   try {
-    const { roomId, content, messageType = "text" } = req.body;
+    const { roomId, content } = req.body;
     const userId = req.user?.id;
 
     if (!roomId || !content) {
@@ -37,7 +37,6 @@ export const createMessage = async (
       roomId,
       userId,
       content,
-      messageType,
     });
 
     // Prepare message data for socket emission
@@ -47,7 +46,6 @@ export const createMessage = async (
       userId,
       username: req.user!.username,
       content,
-      messageType,
       createdAt: message.createdAt,
       timestamp: new Date().toISOString(),
     };
@@ -91,7 +89,7 @@ export const getRoomMessages = async (
       include: [
         {
           model: User, as: "sender", 
-          attributes: ['id', 'username', 'profilePicture'],
+          attributes: ['id', 'username'],
         }
       ],
       order: [['createdAt', 'DESC']],

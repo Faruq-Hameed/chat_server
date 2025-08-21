@@ -72,7 +72,9 @@ export const getRoomById = async (
   next: NextFunction
 ) => {
   try {
-    const room = await Room.findByPk(req.params.roomId);
+    const room = await Room.findByPk(req.params.roomId,
+      {include: [{model: RoomInvite, as: "invite"}]}
+    );
     if (!room) {
       throw new NotFoundException("Room not found");
     }
@@ -256,29 +258,29 @@ export const createInvite = async (
   }
 };
 
-/**Controller to get a room invite by the creator */
-export const getRoomInviteByCreator = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  try {
-    const roomId = req.params.roomId;
-    const userId = req.user!.id;
-    //only the person who created the room invite can see the invite
-    const invite = await RoomInvite.findOne({
-      where: { roomId, createdBy: userId },
-      include: { model: Room },
-    });
-    if (!invite) throw new NotFoundException("Invite not found for the room");
+// /**Controller to get a room invite by the creator */
+// export const getRoomInviteByCreator = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   try {
+//     const roomId = req.params.roomId;
+//     const userId = req.user!.id;
+//     //only the person who created the room invite can see the invite
+//     const invite = await RoomInvite.findOne({
+//       where: { roomId, createdBy: userId },
+//       include: { model: Room },
+//     });
+//     if (!invite) throw new NotFoundException("Invite not found for the room");
 
-    res.json({
-      success: true,
-      message: "invite fetched successfully",
-      data: invite,
-    });
-  } catch (error) {}
-};
+//     res.json({
+//       success: true,
+//       message: "invite fetched successfully",
+//       data: invite,
+//     });
+//   } catch (error) {}
+// };
 
 /**Controller to join a private room using the invite token */
 export const joinPrivateRoom = async (

@@ -12,10 +12,12 @@ import {
   HasMany,
   BelongsToMany,
   Index,
+  HasOne,
 } from "sequelize-typescript";
 import { User } from "./User";
 import { RoomMember } from "./RoomMembers";
 import { Message } from "./Message";
+import { RoomInvite } from "./RoomInvite";
 
 @Table({
   tableName: "rooms",
@@ -63,4 +65,7 @@ export class Room extends Model {
 
   @HasMany(() => Message)
   messages!: Message[];
+
+  @HasOne(() => RoomMember)
+  invite!: RoomInvite[];
 }

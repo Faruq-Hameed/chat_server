@@ -8,7 +8,7 @@ import {
   getRoomsByUserId,
   createInvite,
   joinPrivateRoom,
-  getRoomInviteByCreator,
+  // getRoomInviteByCreator,
   getRoomMembers,
   leaveRoom,
 } from "@/controllers/rooms.controllers";
@@ -28,7 +28,7 @@ roomsRouter.get("/users/:userId", [uuidValidator, getRoomsByUserId]);
 roomsRouter.post("/:roomId/join", [uuidValidator, joinPublicRoomById]); //join public room by room id
 
 roomsRouter.post("/:roomId/invites", [uuidValidator, createInvite]); //create invite token by room id
-roomsRouter.get("/:roomId/invites", [uuidValidator, getRoomInviteByCreator]); //get invite token by room id by the creator
+// roomsRouter.get("/:roomId/invites", [uuidValidator, getRoomInviteByCreator]); //get invite token by room id by the creator
 
 roomsRouter.post("/invites/:token/join", joinPrivateRoom);
 

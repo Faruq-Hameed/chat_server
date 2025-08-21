@@ -238,12 +238,13 @@ export const createInvite = async (
     await RoomInvite.destroy({ where: { roomId } });
 
     //create a new token in memory that we be used to enter the room
-    const invite = new RoomInvite({
+    const invite = await RoomInvite.create({
       roomId,
       createdBy: userId,
+      inviteCode: token
+      
     });
-    const link = `${process.env.BASE_URL}/rooms/invites/${invite.inviteCode}/join`;
-    invite.inviteCode = link;
+    const link = `${process.env.BASE_URL}/rooms/invites/${token}/join`;  //This can also be sent to email of other user possibly
     await invite.save();
     res.json({
       success: true,
@@ -252,7 +253,7 @@ export const createInvite = async (
         invite,
         link,
       },
-    }); //This can also be sent to email of other user possibly
+    });
   } catch (err) {
     next(err);
   }
@@ -292,7 +293,7 @@ export const joinPrivateRoom = async (
     const { token } = req.params;
     const userId = req.user!.id;
 
-    const invite = await RoomInvite.findOne({ where: { token } });
+    const invite = await RoomInvite.findOne({ where: { inviteCode: token } });
     if (!invite) throw new NotFoundException("Invalid invite");
     const roomId = invite.roomId;
     // check if user in the membership list
@@ -308,7 +309,7 @@ export const joinPrivateRoom = async (
       RoomMember.create({
         roomId,
         userId,
-        role: "member",
+        // role: "member",
       }),
     ]);
 

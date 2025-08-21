@@ -66,6 +66,6 @@ export class Room extends Model {
   @HasMany(() => Message)
   messages!: Message[];
 
-  @HasOne(() => RoomMember)
-  invite!: RoomInvite[];
+  @HasOne(() => RoomInvite)
+  invite!: RoomInvite;
 }

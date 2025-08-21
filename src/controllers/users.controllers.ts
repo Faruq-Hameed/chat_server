@@ -70,7 +70,7 @@ export const loginController = async (
     if (!comparePassword(value.password, user.password)) {
       throw new BadRequestException("Invalid login credentials");
     }
-    user.password
+    user.password = ""; // hide password from response
     const token = createAuthToken({ id: user.id, username: user.username });
     res.status(200).json({
       success: true,
